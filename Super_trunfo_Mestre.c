@@ -1,150 +1,139 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
-int main() {
-    //Parametros dos dados.
+// Estrutura para armazenar as cartas
+typedef struct {
     char estado[3];
-    char codigo_carta[4];
+    char codigo[4];
     char cidade[50];
     int populacao;
     float area;
     float pib;
     int pontos_turisticos;
-    double Densidade_populacional;
-    double PIB_per_capita;
+} Carta;
 
+// Função para imprimir os dados de uma carta, incluindo os derivados
+void imprimir_carta(Carta c) {
+    float densidade = c.populacao / c.area;
+    float pib_capita = c.pib / c.populacao;
+    float super_trunfo = c.area / c.populacao;
+    float media = (c.populacao + c.area + c.pib + c.pontos_turisticos) / 4.0f;
 
-    //Mensagem de boas-vindas
-    printf("Bem-vindo ao Super Trunfo!\n");
-    printf("Vamos coletar algumas informações sobre a cidade.\n");
+    printf("Cidade: %s | Estado: %s\n", c.cidade, c.estado);
+    printf("Código da carta: %s\n", c.codigo);
+    printf("População: %d habitantes\n", c.populacao);
+    printf("Área: %.2f km²\n", c.area);
+    printf("PIB: R$ %.2f\n", c.pib);
+    printf("Pontos turísticos: %d\n", c.pontos_turisticos);
+    printf("Densidade populacional: %.2f hab/km²\n", densidade);
+    printf("PIB per capita: R$ %.2f\n", pib_capita);
+    printf("Super Trunfo: %.4f\n", super_trunfo);
+    printf("Média dos atributos: %.2f\n", media);
+}
 
-    //Coleta dos dados.
-    printf("A qual estado pertence essa cidade? \n");
-    scanf("%2s", estado);
+// Função para comparar duas cartas
+float calcula_nota_final(Carta c) {
+    float super_trunfo = c.area / c.populacao;
+    float media = (c.populacao + c.area + c.pib + c.pontos_turisticos) / 4.0f;
+    return super_trunfo + media;
+}
 
-    printf("Digite um código para identificar a cidade: \n");
-    scanf("%3s", codigo_carta);
+int main() {
+    srand(time(NULL));
+    int jogadores, escolha1, escolha2, escolha_pc;
+    float nota1, nota2;
 
-    printf("Qual o nome da cidade? \n");
-    scanf("%s", cidade);
+    // Cartas fixas pré-definidas
+    Carta cartas[4] = {
+        {"SP", "A01", "Pindamonhangaba", 170000, 730.2f, 20000.0f, 8},
+        {"RJ", "A02", "Rio de Janeiro", 6500000, 1200.0f, 360000.0f, 35},
+        {"PE", "B13", "Recife", 1500000, 218.5f, 45000.0f, 22},
+        {"DF", "C07", "Brasília", 3100000, 5802.0f, 260000.0f, 20}
+    };
 
-    printf("Quantas pessoas habitam nela? \n");
-    scanf("%i", &populacao);
+    printf("*** Escolha o modo de jogo: ***\n");
+    printf("1 - 1 Jogador (você x computador)\n");
+    printf("2 - 2 Jogadores\n");
+    scanf("%d", &jogadores);
 
-    printf("Qual o tamanho da cidade (em km²)? \n");
-    scanf("%f", &area);
+    if(jogadores == 1) {
+        printf("\nCartas disponíveis:\n");
+        for(int i=0; i<4; i++) {
+            printf("Carta %d:\n", i+1);
+            imprimir_carta(cartas[i]);
+            printf("----------------------------\n");
+        }
+        printf("Escolha o número da sua carta: ");
+        scanf("%d", &escolha1);
+        escolha1--; // Corrige índice para array
 
-    printf("Qual o seu valor do PIB? \n");
-    scanf("%f", &pib);
+        // Sorteia uma carta diferente para o computador
+        do {
+            escolha_pc = rand() % 4;
+        } while(escolha_pc == escolha1);
 
-    printf("Quantos pontos turísticos tem a cidade? \n");
-    scanf("%d", &pontos_turisticos);
+        printf("\nSua carta:\n");
+        imprimir_carta(cartas[escolha1]);
 
-    // Caulculando a densidade populacional
-    Densidade_populacional = (float) populacao / area;
+        printf("\nCarta do computador:\n");
+        imprimir_carta(cartas[escolha_pc]);
 
-    // Calculando o PIB per capita
-    PIB_per_capita = (float) pib / populacao;
+        nota1 = calcula_nota_final(cartas[escolha1]);
+        nota2 = calcula_nota_final(cartas[escolha_pc]);
 
-    // Calculando o Super Trunfo
-    float super_trunfo = (float) area / populacao;
+        printf("\nResultado:\n");
+        if (nota1 > nota2) {
+            printf("Parabéns! Sua carta venceu!\n");
+        } else if (nota1 < nota2) {
+            printf("A carta do computador foi melhor.\n");
+        } else {
+            printf("Empate!\n");
+        }
+    }
+    else if(jogadores == 2) {
+        printf("\nCartas disponíveis:\n");
+        for(int i=0; i<4; i++) {
+            printf("Carta %d:\n", i+1);
+            imprimir_carta(cartas[i]);
+            printf("----------------------------\n");
+        }
+        printf("Jogador 1, escolha o número da sua carta: ");
+        scanf("%d", &escolha1);
+        escolha1--;
 
-    // Somando e fazendo a média das informações
-    float cart_1 = (populacao + area + pib + pontos_turisticos) / 4;
-    float informações_finais1 = super_trunfo + cart_1;
+        do {
+            printf("Jogador 2, escolha o número da sua carta (diferente do Jogador 1): ");
+            scanf("%d", &escolha2);
+            escolha2--;
+            if(escolha2 == escolha1) {
+                printf("Essa carta já foi escolhida pelo Jogador 1. Escolha outra.\n");
+            }
+        } while(escolha2 == escolha1 || escolha2<0 || escolha2>3);
 
-    // Exibindo as informações
-    printf("\nCidade: %s | Estado: %s\n", cidade, estado);
-    printf("Código da carta: %s\n", codigo_carta);
-    printf("O tamanho da cidade é de %.2f km² com %d habitantes\n", area, populacao);
-    printf("O seu PIB é de R$ %.2f e tem %d pontos turísticos\n", pib, pontos_turisticos);
-    printf("A densidade populacional é de %.2ld habitantes por km²\n", Densidade_populacional);
-    printf("O PIB per capita é de R$ %.2ld\n", PIB_per_capita);
-    printf("O Super Trunfo da cidade é de %.2f\n", super_trunfo);
-    printf("\nMédia das informações da carta: %.2f\n", cart_1);
+        printf("\nJogador 1:\n");
+        imprimir_carta(cartas[escolha1]);
+        printf("\nJogador 2:\n");
+        imprimir_carta(cartas[escolha2]);
 
-    // Segunda carta do Super Trunfo
-    printf("\n\n");
-    printf("\n Insira a segunda carta do Super Trunfo!\n");
-    
-    // Carta 2
-    //Parametros dos dados.
-    char estado2[3];
-    char codigo_carta2[4];
-    char cidade2[50];
-    int populacao2;
-    float area2;
-    float pib2;
-    int pontos_turisticos2;
-    double Densidade_populacional2;
-    double PIB_per_capita2;
+        nota1 = calcula_nota_final(cartas[escolha1]);
+        nota2 = calcula_nota_final(cartas[escolha2]);
 
-    //Mensagem de boas-vindas
-    printf("Bem-vindo ao Super Trunfo!\n");
-    printf("Vamos coletar algumas informações sobre a cidade.\n");
-
-    //Coleta dos dados.
-    printf("A qual estado pertence essa cidade? \n");
-    scanf("%2s", estado2);
-
-    printf("Digite um código para identificar a cidade: \n");
-    scanf("%3s", codigo_carta2);
-
-    printf("Qual o nome da cidade? \n");
-    scanf("%s", cidade2);
-
-    printf("Quantas pessoas habitam nela? \n");
-    scanf("%i", &populacao2);
-
-    printf("Qual o tamanho da cidade (em km²)? \n");
-    scanf("%f", &area2);
-
-    printf("Qual o seu valor do PIB? \n");
-    scanf("%f", &pib2);
-
-    printf("Quantos pontos turísticos tem a cidade? \n");
-    scanf("%d", &pontos_turisticos2);
-
-    // Caulculando a densidade populacional
-    Densidade_populacional = (float) populacao2 / area2;
-
-    // Calculando o PIB per capita
-    PIB_per_capita = (float) pib2 / populacao2;
-
-    // Calculando o Super Trunfo
-    float super_trunfo2 = (float) area2 / populacao2;
-
-    // Somando e fazendo a média das informações
-    float cart_2 = (populacao2 + area2 + pib2 + pontos_turisticos2) / 4;
-    float informações_finais2 = super_trunfo2 + cart_2;
-
-    // Exibindo as informações
-    printf("\nCidade: %s | Estado: %s\n", cidade2, estado2);
-    printf("Código da carta: %s\n", codigo_carta2);
-    printf("O tamanho da cidade é de %.2f km² com %d habitantes\n", area2, populacao2);
-    printf("O seu PIB é de R$ %.2f e tem %d pontos turísticos\n", pib2, pontos_turisticos2);
-    printf("A densidade populacional é de %.2ld habitantes por km²\n", Densidade_populacional2);
-    printf("O PIB per capita é de R$ %.2ld\n", PIB_per_capita2);
-    printf("O Super Trunfo da cidade é de %.2f\n", super_trunfo2);
-
-
-    // comparando as cartas
-    printf("\nComparando as cartas...\n");
-    printf("Média das informações da carta 1: %.2f\n", cart_1);
-    printf("Média das informações da carta 2: %.2f\n", cart_2);
-    printf("Super Trunfo da carta 1: %.2f\n", super_trunfo);
-    printf("Super Trunfo da carta 2: %.2f\n", super_trunfo2);
-    if (informações_finais1 > informações_finais2) {
-        printf("A carta 1 é melhor que a carta 2!\n");
-    }   else if (informações_finais1 < informações_finais2) {
-        printf("A carta 2 é melhor que a carta 1!\n");
+        printf("\nResultado:\n");
+        if (nota1 > nota2) {
+            printf("Jogador 1 venceu!\n");
+        } else if (nota1 < nota2) {
+            printf("Jogador 2 venceu!\n");
+        } else {
+            printf("Empate!\n");
+        }
     }
     else {
-        printf("As cartas são iguais!\n");
+        printf("Opção inválida!\n");
     }
-    // Finalizando o jogo
-    printf("\n");
-    printf("Fim do jogo!\n");
-    printf("Obrigado por jogar Super Trunfo!\n");
+
+    printf("\nFim do jogo!\n");
 
     return 0;
 }
